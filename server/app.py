@@ -19,9 +19,15 @@ def customers():
 
     if request.method == 'POST':
         data = request.get_json()
-        customer = Customer(name=data.get('name'), email=data.get('email'), age=data.get('age'))
+        name = data.get('name')
+        exists = Customer.query.filter_by(name=name).first()
+        if exists:
+            return jsonify({"error": "The user exist"}),400
+        customer = Customer(name=name, email=data.get('email'), age=data.get('age'))
+        
         db.session.add(customer)
         db.session.commit()
+        
         return make_response(
             jsonify(
                 {'id': customer.id, 'name': customer.name, 'email': customer.email, 'age': customer.age }))
